@@ -1,0 +1,22 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          spotify:
+            client-id: 97c47754b33b42c09dc52d5a0ec40caa
+            client-secret: a2e554eb78544482bfb47c215d841159
+            scope: playlist-read-private,user-read-email
+            authorization-grant-type: client_credentials
+        provider:
+          spotify:
+            token-uri: https://accounts.spotify.com/api/token
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/rhythm-recs
+    username: sirpripyat
+    password: WATTSON8
+
+  jpa:
+    hibernate:
+      ddl-auto: update
