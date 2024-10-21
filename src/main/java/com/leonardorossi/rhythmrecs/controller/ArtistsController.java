@@ -6,9 +6,10 @@ import com.leonardorossi.rhythmrecs.clients.spotify.dtos.LoginRequestDto;
 import com.leonardorossi.rhythmrecs.clients.spotify.dtos.LoginResponseDto;
 import com.leonardorossi.rhythmrecs.dtos.FavoritesArtistsDto;
 import com.leonardorossi.rhythmrecs.services.ArtistsService;
+import com.leonardorossi.rhythmrecs.services.SpotifyAuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +20,18 @@ import java.util.List;
 @RequestMapping("/artists")
 @RequiredArgsConstructor
 @Transactional
-@Log4j2
+@Slf4j
 public class ArtistsController {
     
-    private final AuthSpotifyClient authSpotifyClient;
+    private final SpotifyAuthService spotifyAuthService;
     
     private final ArtistsService artistsService;
     
     @GetMapping
     public ResponseEntity<List<ArtistResponseDto>> getArtistsBasedOnGenre(@RequestParam Long id) throws BadRequestException {
         try {
-            String token = getToken();
-            
-            return ResponseEntity.ok(artistsService.getGenresByPerson(id, token));
+            return ResponseEntity.ok(artistsService.getGenresByPerson(id,
+                spotifyAuthService.getToken()));
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new BadRequestException(e);
@@ -43,9 +43,8 @@ public class ArtistsController {
         @RequestParam String query
     ) throws BadRequestException {
         try {
-            String token = getToken();
-            
-            return ResponseEntity.ok(artistsService.searchArtists(query, token));
+            return ResponseEntity.ok(artistsService.searchArtists(query,
+                spotifyAuthService.getToken()));
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
@@ -65,13 +64,6 @@ public class ArtistsController {
             log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
         }
-    }
-    
-    private String getToken() {
-        LoginRequestDto request = LoginRequestDto.buildObject();
-        LoginResponseDto loginResponseDto = authSpotifyClient.login(request);
-        
-        return "Bearer " + loginResponseDto.accessToken();
     }
     
 }

@@ -4,15 +4,15 @@ import com.leonardorossi.rhythmrecs.clients.spotify.AuthSpotifyClient;
 import com.leonardorossi.rhythmrecs.clients.spotify.dtos.LoginRequestDto;
 import com.leonardorossi.rhythmrecs.clients.spotify.dtos.LoginResponseDto;
 import com.leonardorossi.rhythmrecs.clients.spotify.dtos.TrackDto;
+import com.leonardorossi.rhythmrecs.dtos.FavoritesTracksDto;
 import com.leonardorossi.rhythmrecs.services.FavoritesMusicsService;
+import com.leonardorossi.rhythmrecs.services.SpotifyAuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,21 +20,21 @@ import java.util.List;
 @RequestMapping("/tracks")
 @RequiredArgsConstructor
 @Transactional
-@Log4j2
+@Slf4j
 public class TracksController {
     
     private final FavoritesMusicsService service;
     
-    private final AuthSpotifyClient authSpotifyClient;
+    private final SpotifyAuthService spotifyAuthService;
     
     @GetMapping
     public ResponseEntity<List<TrackDto>> getTracks(
         @RequestParam long personId
     ) {
         try {
-            String token = this.getToken();
             return ResponseEntity
-                .ok(service.getMusicsByFavoritesArtistsFromPerson(personId, token));
+                .ok(service.getMusicsByFavoritesArtistsFromPerson(personId,
+                    spotifyAuthService.getToken()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
@@ -46,20 +46,26 @@ public class TracksController {
         @RequestParam String query
     ) {
         try {
-            String token = this.getToken();
-            
-            return ResponseEntity.ok(service.search(query, token));
+            return ResponseEntity.ok(service.search(query, spotifyAuthService.getToken()));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
     }
     
-    private String getToken() {
-        LoginRequestDto request = LoginRequestDto.buildObject();
-        LoginResponseDto loginResponseDto = authSpotifyClient.login(request);
-        
-        return "Bearer " + loginResponseDto.accessToken();
+    @PostMapping
+    public ResponseEntity<Void> register(
+        @RequestBody List<FavoritesTracksDto> dto,
+        @RequestParam long personId
+    ) throws BadRequestException {
+        try {
+            service.register(dto, personId);
+            
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
     
 }

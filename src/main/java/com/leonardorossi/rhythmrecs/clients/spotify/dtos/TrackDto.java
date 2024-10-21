@@ -1,7 +1,9 @@
 package com.leonardorossi.rhythmrecs.clients.spotify.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
+@Getter
 public class TrackDto {
     
     @JsonProperty("duration_ms")

@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           spotify:
-            client-id: 97c47754b33b42c09dc52d5a0ec40caa
-            client-secret: a2e554eb78544482bfb47c215d841159
+            client-id: ${SPOTIFY_CLIENT_ID}
+            client-secret: ${SPOTIFY_CLIENT_SECRET}
             scope: playlist-read-private,user-read-email
             authorization-grant-type: client_credentials
         provider:
@@ -13,9 +13,9 @@ spring:
             token-uri: https://accounts.spotify.com/api/token
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/rhythm-recs
-    username: sirpripyat
-    password: WATTSON8
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
 
   jpa:
     hibernate:

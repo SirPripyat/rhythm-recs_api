@@ -35,7 +35,13 @@ public class Person {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<FavoritesArtists> artistsList;
     
-    public Person buildPerson(Long id) {
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<AudioFeature> audioFeatures;
+    
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
+    private List<RecommendationRating> recommendationRatings;
+    
+    public static Person buildPerson(Long id) {
         return Person.builder()
             .id(id)
             .build();

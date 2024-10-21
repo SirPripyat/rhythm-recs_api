@@ -1,8 +1,11 @@
 package com.leonardorossi.rhythmrecs.clients.spotify;
 
 import com.leonardorossi.rhythmrecs.clients.spotify.dtos.*;
+import com.leonardorossi.rhythmrecs.controller.AudioFeatureResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(name = "SpotifyClient", url = "https://api.spotify.com/v1")
 public interface SpotifyClient {
@@ -40,4 +43,9 @@ public interface SpotifyClient {
         @RequestHeader("Authorization") String authorization
     );
     
+    @GetMapping("/audio-features")
+    AudioFeatureResponseDto getAudioFeatures(
+        @RequestParam("ids") String ids,
+        @RequestHeader("Authorization") String authorization
+    );
 }
